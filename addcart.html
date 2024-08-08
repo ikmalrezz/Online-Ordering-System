@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customize Your Order</title>
+    <style>
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+            align-items: center;
+        }
+        .item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+        .total {
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Customize Your Drink</h1>
+        <form id="order-form">
+            <div class="item">
+                <label for="base">Choose your base:</label>
+                <select id="base" name="base" onchange="updatePrice()">
+                    <option value="0">Espresso - RM 0</option>
+                    <option value="2">Latte - RM 2</option>
+                    <option value="1">Cappuccino - RM 1</option>
+                </select>
+            </div>
+            <div class="item">
+                <label><input type="checkbox" name="topping" value="2" onclick="updatePrice()"> More Caffeine (RM 2)</label>
+            </div>
+            <div class="item">
+                <label><input type="checkbox" name="topping" value="2" onclick="updatePrice()"> Sweet my Drinks (RM 2)</label>
+            </div>
+            <div class="item">
+                <label><input type="checkbox" name="topping" value="2" onclick="updatePrice()"> Drizzle (RM 2)</label>
+            </div>
+            <div class="item">
+                <label><input type="checkbox" name="topping" value="2" onclick="updatePrice()"> Twirl Me Up (RM 2)</label>
+            </div>
+            <div class="item total">
+                Total Price: RM<span id="total-price">0</span>
+            </div>
+            <button type="button" class="btn" onclick="addToCart()">Add to Cart</button>
+        </form>
+        <a href="cart.php" class="btn">Go to Cart</a>
+    </div>
+    <script>
+        function updatePrice() {
+            let basePrice = parseFloat(document.getElementById('base').value);
+            let toppings = document.querySelectorAll('input[name="topping"]:checked');
+            let toppingPrice = 0;
+            toppings.forEach((topping) => {
+                toppingPrice += parseFloat(topping.value);
+            });
+            let totalPrice = basePrice + toppingPrice;
+            document.getElementById('total-price').innerText = totalPrice.toFixed(2);
+        }
+
+        function addToCart() {
+            let base = document.getElementById('base').value;
+            let toppings = [];
+            document.querySelectorAll('input[name="topping"]:checked').forEach((topping) => {
+                toppings.push(topping.value);
+            });
+            let totalPrice = document.getElementById('total-price').innerText;
+
+            // Send the data to the server via AJAX
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", "add_to_cart.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    alert("Added to cart!");
+                }
+            };
+            xhr.send("base=" + base + "&toppings=" + JSON.stringify(toppings) + "&totalPrice=" + totalPrice);
+        }
+    </script>
+</body>
+</html>
